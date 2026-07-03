@@ -54,6 +54,36 @@
       gallery: [],
       createdAt: '2026-04-18T08:00:00.000Z',
       updatedAt: '2026-06-22T14:00:00.000Z'
+    },
+    {
+      _id: 'house_demo_004',
+      ownerOpenid: 'o_demo_landlord',
+      nickname: '前海公馆 2-706',
+      titleDeed: '前海公馆 2 栋 706',
+      address: '深圳市南山区前海路 66 号前海公馆 2 栋 706',
+      area: 75,
+      layout: { bedrooms: 2, livingrooms: 1, bathrooms: 1 },
+      floor: 7, totalFloors: 26, orientation: '南', decoration: '精装', hasElevator: true,
+      status: 'rented',
+      tags: ['近地铁', '采光好', '可长租'],
+      gallery: [{ fileID: 'att_demo_004', refType: '房产证' }],
+      createdAt: '2026-03-10T08:00:00.000Z',
+      updatedAt: '2026-03-15T09:00:00.000Z'
+    },
+    {
+      _id: 'house_demo_005',
+      ownerOpenid: 'o_demo_landlord',
+      nickname: '科技园 1-1502',
+      titleDeed: '科技园 1 栋 1502',
+      address: '深圳市南山区高新中一道 9 号科技园 1 栋 1502',
+      area: 110,
+      layout: { bedrooms: 3, livingrooms: 2, bathrooms: 2 },
+      floor: 15, totalFloors: 30, orientation: '东南', decoration: '豪装', hasElevator: true,
+      status: 'rented',
+      tags: ['大平层', '带车位', '拎包入住'],
+      gallery: [{ fileID: 'att_demo_005', refType: '房产证' }],
+      createdAt: '2026-01-05T08:00:00.000Z',
+      updatedAt: '2026-01-10T09:00:00.000Z'
     }
   ];
 
@@ -84,6 +114,24 @@
       name: '海岸城A座2203-房产证.jpg',
       ext: 'jpg',
       size: 511000
+    },
+    {
+      _id: 'att_demo_004',
+      fileID: 'att_demo_004',
+      houseId: 'house_demo_004',
+      refType: '房产证',
+      name: '前海公馆2栋706-房产证.jpg',
+      ext: 'jpg',
+      size: 503000
+    },
+    {
+      _id: 'att_demo_005',
+      fileID: 'att_demo_005',
+      houseId: 'house_demo_005',
+      refType: '房产证',
+      name: '科技园1栋1502-房产证.jpg',
+      ext: 'jpg',
+      size: 521000
     }
   ];
 
@@ -185,6 +233,38 @@
       contractRef: { fileID: 'att_demo_003', refType: '租赁合同' },
       createdAt: '2026-05-01T08:00:00.000Z',
       updatedAt: '2026-05-01T08:00:00.000Z'
+    },
+    {
+      _id: 'lease_demo_002',
+      houseId: 'house_demo_004',
+      tenantId: 'tenant_demo_002',
+      startDate: '2026-03-15',
+      endDate: '2027-03-14',
+      rent: 520000,
+      deposit: 520000,
+      payCycle: 'month',
+      payMethod: '支付宝 / 工行尾号8821',
+      status: 'active',
+      renewed: false,
+      contractRef: { fileID: 'att_demo_004', refType: '租赁合同' },
+      createdAt: '2026-03-15T08:00:00.000Z',
+      updatedAt: '2026-03-15T08:00:00.000Z'
+    },
+    {
+      _id: 'lease_demo_003',
+      houseId: 'house_demo_005',
+      tenantId: 'tenant_demo_003',
+      startDate: '2026-01-10',
+      endDate: '2026-12-31',
+      rent: 980000,
+      deposit: 980000,
+      payCycle: 'month',
+      payMethod: '微信零钱 / 招行尾号3312',
+      status: 'active',
+      renewed: false,
+      contractRef: { fileID: 'att_demo_005', refType: '租赁合同' },
+      createdAt: '2026-01-10T08:00:00.000Z',
+      updatedAt: '2026-01-10T08:00:00.000Z'
     }
   ];
 
@@ -202,6 +282,34 @@
       occupants: 2,
       emergencyContact: '配偶 13800000003',
       sourceChannel: '中介'
+    },
+    {
+      _id: 'tenant_demo_002',
+      leaseId: 'lease_demo_002',
+      wechat: 'wxid_tenant_b',
+      phone: '13900000012',
+      idCard: '4403**********5678',
+      householdReg: '非深户',
+      occupation: '金融 · 风控',
+      income: 320000,
+      hasPet: true,
+      occupants: 3,
+      emergencyContact: '配偶 13800000013',
+      sourceChannel: '中介'
+    },
+    {
+      _id: 'tenant_demo_003',
+      leaseId: 'lease_demo_003',
+      wechat: 'wxid_tenant_c',
+      phone: '13900000022',
+      idCard: '4403**********9012',
+      householdReg: '深户',
+      occupation: '教育 · 教师',
+      income: 180000,
+      hasPet: false,
+      occupants: 2,
+      emergencyContact: '父母 13800000023',
+      sourceChannel: '自媒体'
     }
   ];
 
@@ -211,7 +319,13 @@
     { _id: 'ua_demo_002', houseId: 'house_demo_002', leaseId: 'lease_demo_001', type: 'electricity', accountNo: '电表 0218-335', moveInReading: 9640, moveOutReading: null, transferStatus: 'done' },
     { _id: 'ua_demo_003', houseId: 'house_demo_002', leaseId: 'lease_demo_001', type: 'gas', accountNo: '燃气 0218-336', moveInReading: 305, moveOutReading: null, transferStatus: 'pending' },
     { _id: 'ua_demo_004', houseId: 'house_demo_002', leaseId: 'lease_demo_001', type: 'property', accountNo: '物业 海岸城物业', moveInReading: null, moveOutReading: null, transferStatus: 'pending' },
-    { _id: 'ua_demo_005', houseId: 'house_demo_002', leaseId: 'lease_demo_001', type: 'broadband', accountNo: '宽带 电信 100M', moveInReading: null, moveOutReading: null, transferStatus: 'done' }
+    { _id: 'ua_demo_005', houseId: 'house_demo_002', leaseId: 'lease_demo_001', type: 'broadband', accountNo: '宽带 电信 100M', moveInReading: null, moveOutReading: null, transferStatus: 'done' },
+    { _id: 'ua_demo_006', houseId: 'house_demo_004', leaseId: 'lease_demo_002', type: 'water', accountNo: '水表 0732-118', moveInReading: 2240, moveOutReading: null, transferStatus: 'done' },
+    { _id: 'ua_demo_007', houseId: 'house_demo_004', leaseId: 'lease_demo_002', type: 'electricity', accountNo: '电表 0732-119', moveInReading: 12340, moveOutReading: null, transferStatus: 'done' },
+    { _id: 'ua_demo_008', houseId: 'house_demo_004', leaseId: 'lease_demo_002', type: 'gas', accountNo: '燃气 0732-120', moveInReading: 512, moveOutReading: null, transferStatus: 'pending' },
+    { _id: 'ua_demo_009', houseId: 'house_demo_005', leaseId: 'lease_demo_003', type: 'water', accountNo: '水表 1102-778', moveInReading: 990, moveOutReading: null, transferStatus: 'done' },
+    { _id: 'ua_demo_010', houseId: 'house_demo_005', leaseId: 'lease_demo_003', type: 'electricity', accountNo: '电表 1102-779', moveInReading: 22100, moveOutReading: null, transferStatus: 'done' },
+    { _id: 'ua_demo_011', houseId: 'house_demo_005', leaseId: 'lease_demo_003', type: 'gas', accountNo: '燃气 1102-780', moveInReading: 188, moveOutReading: null, transferStatus: 'done' }
   ];
 
   var handovers = [
@@ -231,6 +345,40 @@
       done: false,
       createdAt: '2026-05-01T08:00:00.000Z',
       updatedAt: '2026-05-01T08:00:00.000Z'
+    },
+    {
+      _id: 'ho_demo_002',
+      houseId: 'house_demo_004',
+      leaseId: 'lease_demo_002',
+      handedAt: '2026-03-15',
+      note: '钥匙 3 把、门禁卡 2 张、已拍视频留底',
+      items: [
+        { name: '入户门钥匙', ok: true, note: '' },
+        { name: '门禁卡', ok: true, note: '' },
+        { name: '水表读数确认', ok: true, note: '2240' },
+        { name: '电表读数确认', ok: true, note: '12340' },
+        { name: '家具家电清点', ok: true, note: '空调 2 台正常' }
+      ],
+      done: true,
+      createdAt: '2026-03-15T08:00:00.000Z',
+      updatedAt: '2026-03-15T08:00:00.000Z'
+    },
+    {
+      _id: 'ho_demo_003',
+      houseId: 'house_demo_005',
+      leaseId: 'lease_demo_003',
+      handedAt: '2026-01-10',
+      note: '钥匙 2 把、已交钥匙密码盒',
+      items: [
+        { name: '入户门钥匙', ok: true, note: '' },
+        { name: '门禁卡', ok: true, note: '' },
+        { name: '水表读数确认', ok: true, note: '990' },
+        { name: '电表读数确认', ok: false, note: '电表异常需复核' },
+        { name: '家具家电清点', ok: true, note: '齐全' }
+      ],
+      done: true,
+      createdAt: '2026-01-10T08:00:00.000Z',
+      updatedAt: '2026-01-10T08:00:00.000Z'
     }
   ];
 
@@ -257,6 +405,28 @@
       cost: 0,
       status: 'doing',
       proofRef: { fileID: '', refType: '维修凭证' }
+    },
+    {
+      _id: 'rp_demo_003',
+      houseId: 'house_demo_004',
+      kind: 'property',
+      reportedAt: '2026-04-02T11:00:00.000Z',
+      issue: '电梯间感应灯常亮',
+      handler: '物业 · 工程部',
+      cost: 0,
+      status: 'done',
+      proofRef: { fileID: '', refType: '维修凭证' }
+    },
+    {
+      _id: 'rp_demo_004',
+      houseId: 'house_demo_005',
+      kind: 'in_unit',
+      reportedAt: '2026-05-18T16:20:00.000Z',
+      issue: '厨房下水管渗水',
+      handler: '售后 · 管道 周师傅',
+      cost: 22000,
+      status: 'done',
+      proofRef: { fileID: '', refType: '维修凭证' }
     }
   ];
 
@@ -268,7 +438,19 @@
     { _id: 'bill_demo_003', leaseId: 'lease_demo_001', period: '2026-07', dueDate: '2026-07-01', items: [{ type: 'rent', amount: 680000 }], total: 680000, status: 'unpaid', paidAt: null, receiptRef: null },
     { _id: 'bill_demo_004', leaseId: 'lease_demo_001', period: '2026-08', dueDate: '2026-08-01', items: [{ type: 'rent', amount: 680000 }], total: 680000, status: 'unpaid', paidAt: null, receiptRef: null },
     { _id: 'bill_demo_005', leaseId: 'lease_demo_001', period: '2026-09', dueDate: '2026-09-01', items: [{ type: 'rent', amount: 680000 }], total: 680000, status: 'unpaid', paidAt: null, receiptRef: null },
-    { _id: 'bill_demo_006', leaseId: 'lease_demo_001', period: '2026-10', dueDate: '2026-10-01', items: [{ type: 'rent', amount: 680000 }], total: 680000, status: 'unpaid', paidAt: null, receiptRef: null }
+    { _id: 'bill_demo_006', leaseId: 'lease_demo_001', period: '2026-10', dueDate: '2026-10-01', items: [{ type: 'rent', amount: 680000 }], total: 680000, status: 'unpaid', paidAt: null, receiptRef: null },
+    { _id: 'bill_demo_007', leaseId: 'lease_demo_002', period: '2026-03', dueDate: '2026-03-15', items: [{ type: 'rent', amount: 520000 }], total: 520000, status: 'paid', paidAt: '2026-03-16', receiptRef: { fileID: 'att_demo_004', refType: '微信转账' } },
+    { _id: 'bill_demo_008', leaseId: 'lease_demo_002', period: '2026-04', dueDate: '2026-04-15', items: [{ type: 'rent', amount: 520000 }], total: 520000, status: 'unpaid', paidAt: null, receiptRef: null },
+    { _id: 'bill_demo_009', leaseId: 'lease_demo_002', period: '2026-05', dueDate: '2026-05-15', items: [{ type: 'rent', amount: 520000 }], total: 520000, status: 'unpaid', paidAt: null, receiptRef: null },
+    { _id: 'bill_demo_010', leaseId: 'lease_demo_002', period: '2026-06', dueDate: '2026-06-15', items: [{ type: 'rent', amount: 520000 }], total: 520000, status: 'unpaid', paidAt: null, receiptRef: null },
+    { _id: 'bill_demo_011', leaseId: 'lease_demo_002', period: '2026-07', dueDate: '2026-07-15', items: [{ type: 'rent', amount: 520000 }], total: 520000, status: 'unpaid', paidAt: null, receiptRef: null },
+    { _id: 'bill_demo_012', leaseId: 'lease_demo_002', period: '2026-08', dueDate: '2026-08-15', items: [{ type: 'rent', amount: 520000 }], total: 520000, status: 'unpaid', paidAt: null, receiptRef: null },
+    { _id: 'bill_demo_013', leaseId: 'lease_demo_003', period: '2026-01', dueDate: '2026-01-10', items: [{ type: 'rent', amount: 980000 }], total: 980000, status: 'paid', paidAt: '2026-01-11', receiptRef: { fileID: 'att_demo_005', refType: '微信转账' } },
+    { _id: 'bill_demo_014', leaseId: 'lease_demo_003', period: '2026-02', dueDate: '2026-02-10', items: [{ type: 'rent', amount: 980000 }], total: 980000, status: 'paid', paidAt: '2026-02-12', receiptRef: { fileID: 'att_demo_005', refType: '支付宝' } },
+    { _id: 'bill_demo_015', leaseId: 'lease_demo_003', period: '2026-03', dueDate: '2026-03-10', items: [{ type: 'rent', amount: 980000 }], total: 980000, status: 'unpaid', paidAt: null, receiptRef: null },
+    { _id: 'bill_demo_016', leaseId: 'lease_demo_003', period: '2026-04', dueDate: '2026-04-10', items: [{ type: 'rent', amount: 980000 }], total: 980000, status: 'unpaid', paidAt: null, receiptRef: null },
+    { _id: 'bill_demo_017', leaseId: 'lease_demo_003', period: '2026-05', dueDate: '2026-05-10', items: [{ type: 'rent', amount: 980000 }], total: 980000, status: 'unpaid', paidAt: null, receiptRef: null },
+    { _id: 'bill_demo_018', leaseId: 'lease_demo_003', period: '2026-06', dueDate: '2026-06-10', items: [{ type: 'rent', amount: 980000 }], total: 980000, status: 'unpaid', paidAt: null, receiptRef: null }
   ];
 
   return {

@@ -114,6 +114,11 @@ body {
 .house-card__addr { font-size: 13px; color: #6b7280; margin-top: 4px; }
 .house-card__meta { font-size: 13px; color: #1f2329; margin-top: 6px; }
 .house-card__tags { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+.house-card { transition: background .15s ease; }
+.house-card:hover { background: #f6fbf8; }
+.house-card__more { color: #07c160; font-size: 13px; margin-top: 8px; }
+.toolbar { display: flex; gap: 10px; padding-bottom: 10px; }
+.toolbar .btn--new { flex: 1 1 auto; }
 .tag {
   font-size: 11px;
   color: #07c160;

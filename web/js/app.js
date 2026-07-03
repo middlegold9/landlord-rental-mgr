@@ -7,7 +7,6 @@
   var currentHouseId = null;
 
   var TABS = {
-    overview:   { title: '概览',  render: renderOverview },
     houses:     { title: '房源',  render: renderHouses },
     reminders:  { title: '提醒',  render: renderReminders }
   };
@@ -44,39 +43,6 @@
     return '<div class="subhead"><button type="button" class="link-btn" data-back-detail="1">← 返回详情</button></div>';
   }
 
-  function renderOverview() {
-    seedAll();
-    var houses = LRM.houseRepo.list();
-    var vacant = houses.filter(function (h) { return h.status === 'vacant'; }).length;
-    var rented = houses.filter(function (h) { return h.status === 'rented'; }).length;
-    var total = houses.length;
-    var vacancyRate = total ? Math.round(vacant / total * 100) : 0;
-
-    var bills = LRM.billRepo.all();
-    var dueTotal = 0, received = 0, overdue = 0, unpaid = 0, paid = 0;
-    bills.forEach(function (b) {
-      dueTotal += Number(b.total) || 0;
-      if (b.status === 'paid') { received += Number(b.total) || 0; paid++; }
-      else if (b.status === 'overdue') { overdue++; }
-      else { unpaid++; }
-    });
-    var owed = dueTotal - received;
-
-    return ''
-      + '<section class="card"><h2>房源概览</h2>'
-      +   '<p>房源总数：' + total + ' · 空置 ' + vacant + ' · 已租 ' + rented + '</p>'
-      +   '<p>空置率：' + vacancyRate + '%</p>'
-      + '</section>'
-      + '<section class="card"><h2>收租概览</h2>'
-      +   '<p>应收合计：' + esc(LRM.amount.formatCents(dueTotal)) + '</p>'
-      +   '<p>已收：' + esc(LRM.amount.formatCents(received)) + ' · 欠收：' + esc(LRM.amount.formatCents(owed)) + '</p>'
-      +   '<p class="muted">已缴 ' + paid + ' 笔 · 待缴 ' + unpaid + ' 笔 · 逾期 ' + overdue + ' 笔</p>'
-      + '</section>'
-      + '<section class="card"><h2>导出台账</h2>'
-      +   '<p class="muted">导出全部房源 / 租约 / 账单汇总（可保存为 PDF）。</p>'
-      +   '<div class="form__actions"><button type="button" class="btn" id="export-ledger">导出台账 (PDF)</button></div>'
-      + '</section>';
-  }
   function renderHouses() {
     LRM.houseRepo.seed();
     LRM.attachmentRepo.seed();
@@ -85,7 +51,10 @@
     var searchBox = '<div class="search-wrap">'
       + '<input type="search" id="house-search" class="search" placeholder="搜索昵称 / 地址 / 标签" value="' + esc(houseState.search || '') + '" />'
       + '</div>';
-    var head = '<button type="button" class="btn btn--new" id="new-house">+ 新建房源</button>';
+    var head = '<div class="toolbar">'
+      + '<button type="button" class="btn btn--new" id="new-house">+ 新建房源</button>'
+      + '<button type="button" class="btn" id="export-ledger">导出台账 (PDF)</button>'
+      + '</div>';
     return head + searchBox + LRM.housesPageHtml(houses, houseState.seg);
   }
   function matchesHouseKw(h) {
@@ -189,6 +158,27 @@
         +   '<p class="muted">' + stageText + '</p></section>';
     }
 
+    // 已租房源：租约概要（点击卡片进入详情后可见的更多信息）
+    var summary = '';
+    if (h.status === 'rented') {
+      var sumLease = LRM.leaseRepo.getByHouse(h._id);
+      if (sumLease) {
+        var sumTenant = LRM.tenantRepo.getByLease(sumLease._id);
+        var sumBills = LRM.billRepo.list(sumLease._id);
+        var next = null;
+        sumBills.forEach(function (b) { if (b.status !== 'paid') { if (!next || b.dueDate < next.dueDate) next = b; } });
+        var nextTxt = next
+          ? (next.period + ' 期 · ' + esc(LRM.amount.formatCents(next.total)) + ' · ' + esc(LRM.status.labelOf('BILL_STATUS', next.status)))
+          : '已全部缴清';
+        summary = '<section class="card"><h2>租约概要</h2>'
+          + '<p>租客：' + (sumTenant ? esc(sumTenant.wechat) : '—') + (sumTenant && sumTenant.phone ? '（' + esc(sumTenant.phone) + '）' : '') + '</p>'
+          + '<p>租金：' + esc(LRM.amount.formatCents(sumLease.rent)) + ' / ' + esc(LRM.status.labelOf('PAY_CYCLE', sumLease.payCycle)) + ' · 押金 ' + esc(LRM.amount.formatCents(sumLease.deposit)) + '</p>'
+          + '<p>租期：' + esc(sumLease.startDate) + ' ~ ' + esc(sumLease.endDate) + '</p>'
+          + '<p>下一期应交：' + nextTxt + '</p>'
+          + '</section>';
+      }
+    }
+
     var tenancy = '';
     if (h.status === 'rented') {
       tenancy = '<section class="card"><h2>已租管理</h2>'
@@ -219,6 +209,7 @@
       +   '</div>'
       + '</section>'
       + workflow
+      + summary
       + tenancy
       + maintenance
       + '<section class="card"><h2>图册 / 附件</h2>' + attHtml + '</section>';
@@ -226,8 +217,8 @@
 
   function openDetail(id) {
     currentHouseId = id;
+    seedAll();
     var h = LRM.houseRepo.get(id);
-    seedWorkflow();
     el('page').innerHTML = h ? detailHtml(h) : '';
   }
 
@@ -651,6 +642,9 @@
 
     // 返回详情
     if (t.closest('[data-back-detail]')) { openDetail(currentHouseId); return; }
+    // 空置 / 已租 分段切换
+    var segBtn = t.closest('.segment__item');
+    if (segBtn) { houseState.seg = segBtn.getAttribute('data-seg'); renderHouses(); return; }
     // 出房工作台入口
     if (t.closest('#open-channels')) { renderChannels(currentHouseId); return; }
     if (t.closest('#open-showings')) { renderShowings(currentHouseId); return; }
@@ -768,7 +762,7 @@
   }
 
   function show(tab) {
-    var cfg = TABS[tab] || TABS.overview;
+    var cfg = TABS[tab] || TABS.houses;
     el('appbar-title').textContent = cfg.title;
     el('page').innerHTML = cfg.render();
     var items = document.querySelectorAll('.tabbar__item');
@@ -801,7 +795,7 @@
       else if (form.id === 'renew-form') saveRenew(e);
       else if (form.id === 'settle-form') saveSettle(e);
     });
-    show('overview');
+    show('houses');
   }
 
   if (document.readyState === 'loading') {

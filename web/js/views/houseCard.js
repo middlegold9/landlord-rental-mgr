@@ -44,6 +44,7 @@
       +   '<p class="house-card__meta">' + escapeHtml(house.area) + '㎡ · ' + escapeHtml(layout)
       +     ' · ' + escapeHtml(house.orientation || '') + '向</p>'
       +   (tagsHtml ? '<p class="house-card__tags">' + tagsHtml + '</p>' : '')
+      +   '<p class="house-card__more">查看详情 ›</p>'
       + '</article>';
   }
 
