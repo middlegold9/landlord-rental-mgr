@@ -81,7 +81,7 @@ body {
 .tabbar__icon { font-size: 20px; line-height: 1; }
 .tabbar__label { font-size: 11px; }
 
-/* 分段控件（待租 / 已租） */
+/* 分段控件（空置 / 已租） */
 .segment {
   display: flex;
   background: #fff;
@@ -191,3 +191,46 @@ body {
 }
 .att-chip__icon { font-size: 18px; }
 .att-chip__name { font-size: 13px; }
+
+/* 子页公共：返回栏 */
+.subhead { padding: 4px 0 8px; }
+.link-btn {
+  border: none; background: transparent; color: #07c160;
+  font-size: 13px; padding: 4px 2px; cursor: pointer;
+}
+.link-btn.link-danger { color: #fa5151; }
+
+/* 出房工作台网格入口 */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid-2 .btn { margin-top: 0; }
+
+/* 渠道 / 带看 行 */
+.ch-row, .sh-row {
+  border-top: 1px solid #f0f0f0;
+  padding: 10px 0;
+}
+.ch-row:first-of-type, .sh-row:first-of-type { border-top: none; }
+.row-actions { margin-top: 6px; display: flex; gap: 10px; }
+.field--inline { flex-direction: row; align-items: center; gap: 8px; }
+.field--inline input { width: auto; }
+
+/* 价格策略卡（T10） */
+.price-card { border-top: 1px solid #f0f0f0; padding: 12px 0; }
+.price-card:first-of-type { border-top: none; }
+.price-card__head { margin-bottom: 8px; }
+.price-card .btn { margin-top: 8px; }
+
+/* 签约时间轴（T11） */
+.timeline { display: flex; align-items: flex-start; gap: 4px; margin: 12px 0; }
+.tl-step { flex: 1 1 0; text-align: center; position: relative; }
+.tl-step__dot, .tl-dot {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: #e6e8eb; color: #9aa0a6; font-size: 13px; font-weight: 600;
+}
+.tl-label { display: block; font-size: 11px; color: #9aa0a6; margin-top: 4px; }
+.tl-step--current .tl-dot { background: #07c160; color: #fff; }
+.tl-step--current .tl-label { color: #07c160; font-weight: 600; }
+.tl-step--done .tl-dot { background: #b7e6c8; color: #fff; }
+.tl-step--done .tl-label { color: #5a5f66; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }

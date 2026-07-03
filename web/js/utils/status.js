@@ -13,10 +13,12 @@
   'use strict';
 
   var ENUMS = {
-    HOUSE_STATUS: { vacant: '待租', rented: '已租' },
+    HOUSE_STATUS: { vacant: '空置', rented: '已租' },
     BILL_STATUS: { unpaid: '待缴', paid: '已缴', overdue: '逾期' },
     LEASE_STATUS: { active: '生效中', expiring: '即将到期', ended: '已退租' },
-    SHOWING_STATUS: { pending: '待带看', done: '完成', cancelled: '取消', no_show: '爽约' }
+    SHOWING_STATUS: { pending: '待带看', done: '完成', cancelled: '取消', no_show: '爽约' },
+    CHANNEL_TYPE: { agency: '中介', selfmedia: '自媒体', forum: '论坛', other: '其他' },
+    SIGNING_STAGE: { talking: '洽谈', deposit: '意向金', signed: '签约', keys: '交钥匙', rented: '已租' }
   };
 
   // 取值 → 中文标签；未知类型或值原样返回

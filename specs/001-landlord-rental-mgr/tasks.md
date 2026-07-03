@@ -17,11 +17,11 @@
 - [x] checkpoint：可新建房源并挂附件
 
 ## Phase 2 — 待租模块
-- [ ] T8 `channel` 集合 + 渠道管理页（联系人/价格/挂盘状态）
-- [ ] T9 `showing` 预约/记录 + 状态机（pending/done/cancel/no_show）
-- [ ] T10 价格策略 + 双向反馈录入
-- [ ] T11 签约流程状态机（洽谈→意向金→签约→交钥匙→转已租）
-- [ ] checkpoint：待租链路可走通
+- [x] T8 `channel` 集合 + 渠道管理页（联系人/价格/挂盘状态）
+- [x] T9 `showing` 预约/记录 + 状态机（pending/done/cancel/no_show）
+- [x] T10 价格策略 + 双向反馈录入
+- [x] T11 签约流程状态机（洽谈→意向金→签约→交钥匙→转已租）
+- [x] checkpoint：待租链路可走通
 
 ## Phase 3 — 已租 / 租约
 - [ ] T12 `lease` / `tenant` 集合 + 租约信息 / 租客档案

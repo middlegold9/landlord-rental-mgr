@@ -10,7 +10,7 @@ describe('houseCardHtml（房源卡片纯函数）', function () {
     expect(html).toContain('阳光花园');
     expect(html).toContain('深圳南山');
     expect(html).toContain('89㎡');
-    expect(html).toContain('待租');
+    expect(html).toContain('空置');
     expect(html).toContain('data-id="h1"');
   });
 

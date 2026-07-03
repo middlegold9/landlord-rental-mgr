@@ -20,14 +20,14 @@
   function segmentHtml(active) {
     return ''
       + '<div class="segment" id="house-segment">'
-      +   '<button type="button" class="segment__item' + (active === 'vacant' ? ' is-active' : '') + '" data-seg="vacant">待租</button>'
+      +   '<button type="button" class="segment__item' + (active === 'vacant' ? ' is-active' : '') + '" data-seg="vacant">空置</button>'
       +   '<button type="button" class="segment__item' + (active === 'rented' ? ' is-active' : '') + '" data-seg="rented">已租</button>'
       + '</div>';
   }
 
   function housesPageHtml(houses, activeSeg) {
     activeSeg = activeSeg || 'vacant';
-    var label = activeSeg === 'rented' ? '已租' : '待租';
+    var label = activeSeg === 'rented' ? '已租' : '空置';
     var listHtml;
     if (houses && houses.length) {
       listHtml = houses.map(function (h) { return houseCardHtml(h); }).join('');

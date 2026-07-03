@@ -7,7 +7,7 @@ beforeEach(function () {
 });
 
 describe('houseRepo（房源读写封装）', function () {
-  test('seed 注入示例房源，含待租与已租', function () {
+  test('seed 注入示例房源，含空置与已租', function () {
     var houses = houseRepo.list();
     expect(houses.length).toBeGreaterThanOrEqual(3);
     expect(houseRepo.countByStatus('vacant')).toBeGreaterThan(0);

@@ -87,5 +87,86 @@
     }
   ];
 
-  return { houses: houses, attachments: attachments };
+  var channels = [
+    {
+      _id: 'ch_demo_001',
+      houseId: 'house_demo_001',
+      type: 'agency',
+      contact: '链家·王经理 13800000001',
+      commission: 3500,
+      listPrice: 350000,
+      floorPrice: 320000,
+      listed: true,
+      exposure: '高',
+      createdAt: '2026-06-10T08:00:00.000Z',
+      updatedAt: '2026-06-20T10:00:00.000Z'
+    },
+    {
+      _id: 'ch_demo_002',
+      houseId: 'house_demo_001',
+      type: 'selfmedia',
+      contact: '小红书@深圳租房日记',
+      commission: 0,
+      listPrice: 360000,
+      floorPrice: 330000,
+      listed: false,
+      exposure: '中',
+      createdAt: '2026-06-12T08:00:00.000Z',
+      updatedAt: '2026-06-18T10:00:00.000Z'
+    },
+    {
+      _id: 'ch_demo_003',
+      houseId: 'house_demo_003',
+      type: 'forum',
+      contact: '业主论坛·版主',
+      commission: 0,
+      listPrice: 520000,
+      floorPrice: 480000,
+      listed: true,
+      exposure: '低',
+      createdAt: '2026-06-15T08:00:00.000Z',
+      updatedAt: '2026-06-19T10:00:00.000Z'
+    }
+  ];
+
+  var showings = [
+    {
+      _id: 'sh_demo_001',
+      houseId: 'house_demo_001',
+      prospectTenant: '张先生',
+      sourceChannel: '中介',
+      agent: '王经理',
+      appointmentAt: '2026-06-25T10:00:00.000Z',
+      status: 'done',
+      tenantFeedback: '采光不错，考虑中',
+      landlordEval: { score: 4, note: '租客素质高' },
+      createdAt: '2026-06-25T08:00:00.000Z',
+      updatedAt: '2026-06-25T12:00:00.000Z'
+    },
+    {
+      _id: 'sh_demo_002',
+      houseId: 'house_demo_001',
+      prospectTenant: '李女士',
+      sourceChannel: '自媒体',
+      agent: '',
+      appointmentAt: '2026-06-28T15:00:00.000Z',
+      status: 'pending',
+      tenantFeedback: '',
+      landlordEval: { score: 0, note: '' },
+      createdAt: '2026-06-28T08:00:00.000Z',
+      updatedAt: '2026-06-28T08:00:00.000Z'
+    }
+  ];
+
+  var signings = [
+    {
+      _id: 'sg_demo_001',
+      houseId: 'house_demo_001',
+      stage: 'talking',
+      createdAt: '2026-06-20T08:00:00.000Z',
+      updatedAt: '2026-06-20T08:00:00.000Z'
+    }
+  ];
+
+  return { houses: houses, attachments: attachments, channels: channels, showings: showings, signings: signings };
 });
