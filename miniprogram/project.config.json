@@ -1,0 +1,22 @@
+{
+  "description": "文件缓存小程序 - 仅测试不上线",
+  "miniprogramRoot": "./",
+  "cloudfunctionRoot": "cloudfunctions/",
+  "projectname": "file-cache-mini",
+  "appid": "REPLACE_WITH_YOUR_APPID",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "compileType": "miniprogram",
+  "libVersion": "latest",
+  "condition": {}
+}

@@ -1,0 +1,58 @@
+<view class="container">
+  <view class="header">
+    <text class="title">文件缓存小程序</text>
+    <text class="subtitle">上传图片 / PDF / Word 到云存储</text>
+  </view>
+
+  <!-- 选择并上传 -->
+  <view class="card">
+    <button class="btn btn-primary" bindtap="chooseFile">选择文件</button>
+
+    <view wx:if="{{file}}" class="file-info">
+      <view class="file-row">
+        <text class="label">名称</text>
+        <text class="value">{{file.name}}</text>
+      </view>
+      <view class="file-row">
+        <text class="label">大小</text>
+        <text class="value">{{file.sizeText}}</text>
+      </view>
+      <view class="file-row">
+        <text class="label">类型</text>
+        <text class="value">{{file.category}}</text>
+      </view>
+    </view>
+
+    <button wx:if="{{file}}" class="btn btn-upload" bindtap="uploadFile" loading="{{uploading}}" disabled="{{uploading}}">
+      {{uploading ? '上传中...' : '上传到云存储'}}
+    </button>
+  </view>
+
+  <!-- 上传结果 -->
+  <view wx:if="{{result}}" class="card">
+    <text class="card-title">上传成功</text>
+    <view class="file-row">
+      <text class="label">fileID</text>
+      <text class="value code">{{result.fileID}}</text>
+    </view>
+    <button class="btn btn-ghost" bindtap="openFile">打开 / 预览</button>
+  </view>
+
+  <!-- 已上传列表 -->
+  <view wx:if="{{list.length}}" class="card">
+    <text class="card-title">已上传 ({{list.length}})</text>
+    <view
+      wx:for="{{list}}"
+      wx:key="fileID"
+      class="list-item"
+      bindtap="openItem"
+      data-index="{{index}}"
+    >
+      <view class="list-main">
+        <text class="list-name">{{item.name}}</text>
+        <text class="list-meta">{{item.category}} · {{item.sizeText}}</text>
+      </view>
+      <text class="list-arrow">›</text>
+    </view>
+  </view>
+</view>
