@@ -260,9 +260,20 @@
     }
   ];
 
+  // T15/T16/T17 账单（lease_demo_001，租金 ¥6800/月，月付）
+  // 覆盖状态：已缴 / 逾期（未缴且到期） / 未缴；其余期次由「生成全部账单期次」补齐
+  var bills = [
+    { _id: 'bill_demo_001', leaseId: 'lease_demo_001', period: '2026-05', dueDate: '2026-05-01', items: [{ type: 'rent', amount: 680000 }], total: 680000, status: 'paid', paidAt: '2026-05-02', receiptRef: { fileID: 'att_demo_003', refType: '微信转账' } },
+    { _id: 'bill_demo_002', leaseId: 'lease_demo_001', period: '2026-06', dueDate: '2026-06-01', items: [{ type: 'rent', amount: 680000 }], total: 680000, status: 'unpaid', paidAt: null, receiptRef: null },
+    { _id: 'bill_demo_003', leaseId: 'lease_demo_001', period: '2026-07', dueDate: '2026-07-01', items: [{ type: 'rent', amount: 680000 }], total: 680000, status: 'unpaid', paidAt: null, receiptRef: null },
+    { _id: 'bill_demo_004', leaseId: 'lease_demo_001', period: '2026-08', dueDate: '2026-08-01', items: [{ type: 'rent', amount: 680000 }], total: 680000, status: 'unpaid', paidAt: null, receiptRef: null },
+    { _id: 'bill_demo_005', leaseId: 'lease_demo_001', period: '2026-09', dueDate: '2026-09-01', items: [{ type: 'rent', amount: 680000 }], total: 680000, status: 'unpaid', paidAt: null, receiptRef: null },
+    { _id: 'bill_demo_006', leaseId: 'lease_demo_001', period: '2026-10', dueDate: '2026-10-01', items: [{ type: 'rent', amount: 680000 }], total: 680000, status: 'unpaid', paidAt: null, receiptRef: null }
+  ];
+
   return {
     houses: houses, attachments: attachments, channels: channels, showings: showings,
     signings: signings, leases: leases, tenants: tenants, utilityAccounts: utilityAccounts,
-    handovers: handovers, repairs: repairs
+    handovers: handovers, repairs: repairs, bills: bills
   };
 });

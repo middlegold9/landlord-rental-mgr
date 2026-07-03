@@ -23,7 +23,9 @@
     UTILITY_TYPE: { water: '水', electricity: '电', gas: '燃气', property: '物业', broadband: '宽带' },
     UTILITY_TRANSFER: { pending: '待过户', done: '已过户' },
     REPAIR_KIND: { in_unit: '户内', property: '物业公共' },
-    REPAIR_STATUS: { pending: '待处理', doing: '处理中', done: '已完成', cancelled: '已取消' }
+    REPAIR_STATUS: { pending: '待处理', doing: '处理中', done: '已完成', cancelled: '已取消' },
+    BILL_ITEM_TYPE: { rent: '租金', mgmt: '物业费', parking: '停车费' },
+    HANDOVER_KIND: { move_in: '入驻', move_out: '退租' }
   };
 
   // 取值 → 中文标签；未知类型或值原样返回

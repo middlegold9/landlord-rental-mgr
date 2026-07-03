@@ -27,26 +27,139 @@
     LRM.handoverRepo.seed();
     LRM.repairRepo.seed();
   }
+  function seedBilling() { LRM.billRepo.seed(); }
+  function seedAll() {
+    LRM.houseRepo.seed();
+    LRM.attachmentRepo.seed();
+    seedWorkflow();
+    seedTenancy();
+    seedBilling();
+  }
+  function daysBetween(a, b) {
+    var da = new Date(a + 'T00:00:00'), db = new Date(b + 'T00:00:00');
+    return Math.round((db - da) / 86400000);
+  }
 
   function backBar() {
     return '<div class="subhead"><button type="button" class="link-btn" data-back-detail="1">← 返回详情</button></div>';
   }
 
   function renderOverview() {
+    seedAll();
+    var houses = LRM.houseRepo.list();
+    var vacant = houses.filter(function (h) { return h.status === 'vacant'; }).length;
+    var rented = houses.filter(function (h) { return h.status === 'rented'; }).length;
+    var total = houses.length;
+    var vacancyRate = total ? Math.round(vacant / total * 100) : 0;
+
+    var bills = LRM.billRepo.all();
+    var dueTotal = 0, received = 0, overdue = 0, unpaid = 0, paid = 0;
+    bills.forEach(function (b) {
+      dueTotal += Number(b.total) || 0;
+      if (b.status === 'paid') { received += Number(b.total) || 0; paid++; }
+      else if (b.status === 'overdue') { overdue++; }
+      else { unpaid++; }
+    });
+    var owed = dueTotal - received;
+
     return ''
-      + '<section class="card"><h2>本月收租</h2><p class="muted">（Phase 1 起接入数据）</p></section>'
-      + '<section class="card"><h2>房源概览</h2><p>空置 / 已租 统计将在此展示。</p></section>';
+      + '<section class="card"><h2>房源概览</h2>'
+      +   '<p>房源总数：' + total + ' · 空置 ' + vacant + ' · 已租 ' + rented + '</p>'
+      +   '<p>空置率：' + vacancyRate + '%</p>'
+      + '</section>'
+      + '<section class="card"><h2>收租概览</h2>'
+      +   '<p>应收合计：' + esc(LRM.amount.formatCents(dueTotal)) + '</p>'
+      +   '<p>已收：' + esc(LRM.amount.formatCents(received)) + ' · 欠收：' + esc(LRM.amount.formatCents(owed)) + '</p>'
+      +   '<p class="muted">已缴 ' + paid + ' 笔 · 待缴 ' + unpaid + ' 笔 · 逾期 ' + overdue + ' 笔</p>'
+      + '</section>'
+      + '<section class="card"><h2>导出台账</h2>'
+      +   '<p class="muted">导出全部房源 / 租约 / 账单汇总（可保存为 PDF）。</p>'
+      +   '<div class="form__actions"><button type="button" class="btn" id="export-ledger">导出台账 (PDF)</button></div>'
+      + '</section>';
   }
   function renderHouses() {
     LRM.houseRepo.seed();
     LRM.attachmentRepo.seed();
     seedWorkflow();
-    var houses = LRM.houseRepo.list(houseState.seg);
+    var houses = LRM.houseRepo.list(houseState.seg).filter(matchesHouseKw);
+    var searchBox = '<div class="search-wrap">'
+      + '<input type="search" id="house-search" class="search" placeholder="搜索昵称 / 地址 / 标签" value="' + esc(houseState.search || '') + '" />'
+      + '</div>';
     var head = '<button type="button" class="btn btn--new" id="new-house">+ 新建房源</button>';
-    return head + LRM.housesPageHtml(houses, houseState.seg);
+    return head + searchBox + LRM.housesPageHtml(houses, houseState.seg);
+  }
+  function matchesHouseKw(h) {
+    var kw = (houseState.search || '').trim().toLowerCase();
+    if (!kw) return true;
+    var hay = [h.nickname, h.address, h.titleDeed, (h.tags || []).join(' ')].join(' ').toLowerCase();
+    return hay.indexOf(kw) !== -1;
+  }
+  function renderHouseListOnly() {
+    var listEl = el('house-list');
+    if (!listEl) return;
+    var houses = LRM.houseRepo.list(houseState.seg).filter(matchesHouseKw);
+    var label = houseState.seg === 'rented' ? '已租' : '空置';
+    listEl.innerHTML = houses.length
+      ? houses.map(LRM.houseCardHtml).join('')
+      : '<p class="empty muted">暂无匹配' + label + '房源</p>';
+  }
+  function exportLedger() {
+    var w = window.open('', '_blank');
+    if (!w) return;
+    w.document.write(buildLedgerHtml());
+    w.document.close();
+    w.focus();
+    setTimeout(function () { w.print(); }, 300);
+  }
+  function buildLedgerHtml() {
+    seedAll();
+    var rows = LRM.houseRepo.list().map(function (h) {
+      var lease = LRM.leaseRepo.getByHouse(h._id);
+      var tenant = lease ? LRM.tenantRepo.getByLease(lease._id) : null;
+      var bills = lease ? LRM.billRepo.list(lease._id) : [];
+      var received = 0, due = 0;
+      bills.forEach(function (b) { due += Number(b.total) || 0; if (b.status === 'paid') received += Number(b.total) || 0; });
+      return {
+        name: esc(h.nickname), status: esc(LRM.status.labelOf('HOUSE_STATUS', h.status)),
+        tenant: tenant ? esc(tenant.wechat) : '—',
+        rent: lease ? (esc(LRM.amount.formatCents(lease.rent)) + ' / ' + esc(LRM.status.labelOf('PAY_CYCLE', lease.payCycle))) : '—',
+        received: esc(LRM.amount.formatCents(received)), owed: esc(LRM.amount.formatCents(due - received))
+      };
+    });
+    var thead = '<tr><th>房源</th><th>状态</th><th>租客</th><th>租金/周期</th><th>已收</th><th>欠收</th></tr>';
+    var tbody = rows.map(function (r) {
+      return '<tr><td>' + r.name + '</td><td>' + r.status + '</td><td>' + r.tenant + '</td><td>' + r.rent
+        + '</td><td>' + r.received + '</td><td>' + r.owed + '</td></tr>';
+    }).join('');
+    return '<!doctype html><html><head><meta charset="utf-8"><title>收租台账</title>'
+      + '<style>body{font-family:sans-serif;padding:24px}h1{font-size:18px}table{width:100%;border-collapse:collapse;margin-top:12px}'
+      + 'th,td{border:1px solid #ddd;padding:6px 8px;font-size:13px;text-align:left}</style></head>'
+      + '<body><h1>收租台账 · 生成于 ' + new Date().toLocaleString() + '</h1>'
+      + '<table><thead>' + thead + '</thead><tbody>' + tbody + '</tbody></table></body></html>';
   }
   function renderReminders() {
-    return '<section class="card"><h2>提醒</h2><p class="muted">带看 / 交租 / 到期 聚合（Phase 5 实现）。</p></section>';
+    seedAll();
+    var today = new Date().toISOString().slice(0, 10);
+    function inRange(d) { var n = daysBetween(today, d); return n >= 0 && n <= 7; }
+    var showings = LRM.showingRepo.list().filter(function (s) { return s.status === 'pending'; });
+    var bills = LRM.billRepo.all();
+    var overdueBills = bills.filter(function (b) { return b.status === 'overdue'; });
+    var dueSoon = bills.filter(function (b) { return b.status === 'unpaid' && inRange(b.dueDate); });
+    var leases = LRM.leaseRepo.list();
+    var expiring = leases.filter(function (l) { return l.status !== 'ended' && inRange(l.endDate); });
+
+    function dot(n) { return n ? '<span class="dot dot--bad"></span>' : '<span class="dot"></span>'; }
+    function rowHtml(title, n) { return '<p>' + dot(n) + ' ' + esc(title) + '：' + n + '</p>'; }
+
+    return ''
+      + '<section class="card"><h2>提醒中心</h2>'
+      +   rowHtml('待带看', showings.length)
+      +   rowHtml('逾期账单', overdueBills.length)
+      +   rowHtml('7 日内应交', dueSoon.length)
+      +   rowHtml('30 日内到期', expiring.length)
+      +   (showings.length + overdueBills.length + dueSoon.length + expiring.length === 0
+            ? '<p class="muted">暂无待办提醒。</p>' : '')
+      + '</section>';
   }
 
   // 详情页（只读 + 编辑入口 + 附件列表 + 出房工作台入口）
@@ -82,6 +195,8 @@
         +   '<div class="grid-2">'
         +     '<button type="button" class="btn btn--ghost" id="open-lease">租约 / 租客</button>'
         +     '<button type="button" class="btn btn--ghost" id="open-utility">费用 / 交接单</button>'
+        +     '<button type="button" class="btn btn--ghost" id="open-bills">账单 / 收租</button>'
+        +     '<button type="button" class="btn btn--ghost" id="open-settle">退租 / 续租</button>'
         +   '</div></section>';
     }
 
@@ -370,6 +485,105 @@
     renderRepair(houseId);
   }
 
+  // ——— T15/T16/T17 账单 / 收租 ———
+  function renderBill(houseId, ui) {
+    seedTenancy();
+    seedBilling();
+    var lease = LRM.leaseRepo.getByHouse(houseId);
+    var bills = lease ? LRM.billRepo.list(lease._id) : [];
+    if (lease) LRM.billRepo.refreshOverdue(new Date().toISOString().slice(0, 10));
+    el('page').innerHTML = backBar() + LRM.billPageHtml(LRM.houseRepo.get(houseId), lease, bills, ui || {});
+  }
+  function generateBillsAction() {
+    var lease = LRM.leaseRepo.getByHouse(currentHouseId);
+    if (!lease) { renderBill(currentHouseId); return; }
+    var added = LRM.billRepo.generate(lease._id);
+    renderBill(currentHouseId, { genResult: added ? ('已生成 ' + added + ' 期账单') : '账单期次已齐全' });
+  }
+  function readPayValues(form) {
+    var f = form.elements;
+    return {
+      paidAt: f.paidAt ? f.paidAt.value : '',
+      receiptFileID: f.receiptFileID ? f.receiptFileID.value : '',
+      receiptRefType: f.receiptRefType ? f.receiptRefType.value : ''
+    };
+  }
+  function saveBillPayment(e) {
+    e.preventDefault();
+    var form = e.target;
+    var id = form.getAttribute('data-bill');
+    var vals = readPayValues(form);
+    var p = LRM.buildPay(vals);
+    var errs = LRM.validatePay(p);
+    if (Object.keys(errs).length) {
+      var lease = LRM.leaseRepo.getByHouse(currentHouseId);
+      var bills = LRM.billRepo.list(lease._id);
+      el('page').innerHTML = backBar() + LRM.billPageHtml(LRM.houseRepo.get(currentHouseId), lease, bills, { payId: id, errors: errs });
+      return;
+    }
+    LRM.billRepo.markPaid(id, { paidAt: p.paidAt, receiptRef: { fileID: p.receiptFileID, refType: p.receiptRefType } });
+    renderBill(currentHouseId);
+  }
+
+  // ——— T18 退租清算 / 续租 ———
+  function renderSettle(houseId, ui) {
+    seedTenancy();
+    var lease = LRM.leaseRepo.getByHouse(houseId);
+    var tenant = lease ? LRM.tenantRepo.getByLease(lease._id) : null;
+    el('page').innerHTML = backBar() + LRM.settlePageHtml(LRM.houseRepo.get(houseId), lease, tenant, ui || {});
+  }
+  function readRenewValues(form) {
+    var f = form.elements;
+    return { newEndDate: f.newEndDate ? f.newEndDate.value : '' };
+  }
+  function saveRenew(e) {
+    e.preventDefault();
+    var form = e.target;
+    var lease = LRM.leaseRepo.getByHouse(currentHouseId);
+    var vals = readRenewValues(form);
+    var r = LRM.buildRenew(vals, lease ? { _id: lease._id } : {});
+    var errs = LRM.validateRenew(r, lease);
+    if (Object.keys(errs).length) { renderSettle(currentHouseId, { mode: 'renew', errors: errs, renewDraft: r }); return; }
+    LRM.leaseRepo.renew(lease._id, r.newEndDate);
+    LRM.billRepo.generate(lease._id);
+    openDetail(currentHouseId);
+  }
+  function readSettleValues(form) {
+    var f = form.elements;
+    var items = [];
+    var checks = form.querySelectorAll('[name^="mo_item_"]');
+    for (var i = 0; i < checks.length; i++) {
+      items.push({ name: checks[i].getAttribute('data-name'), ok: checks[i].checked, note: '' });
+    }
+    return {
+      moveOutDate: f.moveOutDate ? f.moveOutDate.value : '',
+      depositDeductionYuan: f.depositDeductionYuan ? f.depositDeductionYuan.value : '',
+      note: f.note ? f.note.value : '',
+      items: items
+    };
+  }
+  function saveSettle(e) {
+    e.preventDefault();
+    var form = e.target;
+    var houseId = form.getAttribute('data-house') || currentHouseId;
+    var lease = LRM.leaseRepo.getByHouse(houseId);
+    var vals = readSettleValues(form);
+    var s = LRM.buildSettle(vals, lease ? { _id: lease._id } : {});
+    var errs = LRM.validateSettle(s);
+    if (Object.keys(errs).length) { renderSettle(houseId, { mode: 'settle', errors: errs, settleDraft: vals }); return; }
+    var deposit = lease.deposit || 0;
+    var deduction = s.depositDeduction || 0;
+    LRM.leaseRepo.settle(lease._id, {
+      moveOutDate: s.moveOutDate,
+      depositDeduction: deduction,
+      refundAmount: deposit - deduction,
+      note: s.note
+    });
+    LRM.handoverRepo.save(lease._id, { handedAt: s.moveOutDate, note: s.note, items: s.items, done: true }, 'move_out');
+    LRM.utilityRepo.list(houseId).forEach(function (u) { LRM.utilityRepo.update(u._id, { transferStatus: 'done' }); });
+    openDetail(houseId);
+  }
+
   // ——— T6 房源表单 ———
   function renderHouseForm(house, errors) {
     formState.house = house || null;
@@ -508,6 +722,27 @@
     if (t.closest('#add-repair')) { renderRepair(currentHouseId, {}, null); return; }
     if (t.closest('[data-repair-cancel]')) { renderRepair(currentHouseId, null, null); return; }
 
+    // T15/T16/T17 账单 / 收租
+    if (t.closest('#open-bills')) { renderBill(currentHouseId); return; }
+    if (t.closest('[data-generate-bills]')) { generateBillsAction(); return; }
+    var payB = t.closest('[data-pay-bill]');
+    if (payB) {
+      var leaseB = LRM.leaseRepo.getByHouse(currentHouseId);
+      var billsB = LRM.billRepo.list(leaseB._id);
+      el('page').innerHTML = backBar() + LRM.billPageHtml(LRM.houseRepo.get(currentHouseId), leaseB, billsB, { payId: payB.getAttribute('data-pay-bill') });
+      return;
+    }
+    if (t.closest('[data-pay-cancel]')) { renderBill(currentHouseId); return; }
+
+    // T18 退租清算 / 续租
+    if (t.closest('#open-settle')) { renderSettle(currentHouseId); return; }
+    if (t.closest('[data-renew]')) { renderSettle(currentHouseId, { mode: 'renew' }); return; }
+    if (t.closest('[data-settle]')) { renderSettle(currentHouseId, { mode: 'settle' }); return; }
+    if (t.closest('[data-settle-cancel]')) { renderSettle(currentHouseId); return; }
+
+    // T19 概览：导出台账
+    if (t.closest('#export-ledger')) { exportLedger(); return; }
+
     // 房源相关（详情 / 列表 / 表单）
     if (t.closest('#back-to-list')) { show('houses'); return; }
     if (t.closest('#new-house')) { renderHouseForm({}, {}); return; }
@@ -549,6 +784,9 @@
     });
     el('page').addEventListener('click', onPageClick);
     el('page').addEventListener('change', onPageChange);
+    el('page').addEventListener('input', function (e) {
+      if (e.target && e.target.id === 'house-search') { houseState.search = e.target.value; renderHouseListOnly(); }
+    });
     el('page').addEventListener('submit', function (e) {
       var form = e.target;
       if (!form || !form.id) return;
@@ -559,6 +797,9 @@
       else if (form.id === 'utility-form') saveUtility(e);
       else if (form.id === 'handover-form') saveHandover(e);
       else if (form.id === 'repair-form') saveRepair(e);
+      else if (form.id === 'pay-form') saveBillPayment(e);
+      else if (form.id === 'renew-form') saveRenew(e);
+      else if (form.id === 'settle-form') saveSettle(e);
     });
     show('overview');
   }

@@ -31,6 +31,7 @@
 - `rent`(分/期), `deposit`(分), `payCycle`: `month`|`quarter`
 - `payMethod`(账号), `status`: `active`|`expiring`|`ended`
 - `renewed: bool`, `contractRef: attachmentRef`
+- 退租清算（T18）字段：`moveOutDate`, `settlement: { depositDeduction(分), refundAmount(分), note, settledAt }`
 
 ### tenant（租客档案）
 - `leaseId`, `wechat`, `phone`, `idCard`, `householdReg`, `occupation`, `income`
@@ -46,10 +47,10 @@
 - `houseId`/`leaseId`, `type`（水/电/燃气/物业/宽带）
 - `accountNo`, `moveInReading`, `moveOutReading`, `transferStatus`
 
-### handover（入驻交接单，T13 任务支撑结构）
-- `houseId`, `leaseId`, `handedAt`
+### handover（入驻 / 退租交接单，T13 任务支撑结构，T18 扩展）
+- `houseId`, `leaseId`, `handedAt`, `kind`: `move_in`|`move_out`
 - `items: [{name, ok(bool), note}]`, `note`, `done`(bool)
-- 一条租约对应一份交接单（1—1），按 `leaseId` 存取
+- 一条租约可有「入驻」「退租」两份交接单，按 `(leaseId, kind)` 存取（T18 起）
 
 ### repair（维修/维护）
 - `houseId`, `kind`: `in_unit`|`property`, `reportedAt`

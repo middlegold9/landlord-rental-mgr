@@ -45,5 +45,28 @@
   function remove(id) { return store.remove('lease', id); }
   function seed() { return store.seedIfEmpty('lease', mockData.leases); }
 
-  return { list: list, get: get, getByHouse: getByHouse, create: create, update: update, remove: remove, seed: seed };
+  /** 续租：顺延到期日并标记 renewed（T18） */
+  function renew(id, newEndDate) {
+    return store.update('lease', id, { endDate: newEndDate, renewed: true });
+  }
+
+  /** 退租清算：置为已退租，并记录退租日与押金结算（T18） */
+  function settle(id, info) {
+    info = info || {};
+    return store.update('lease', id, {
+      status: 'ended',
+      moveOutDate: info.moveOutDate || null,
+      settlement: {
+        depositDeduction: info.depositDeduction || 0,
+        refundAmount: info.refundAmount || 0,
+        note: info.note || '',
+        settledAt: new Date().toISOString()
+      }
+    });
+  }
+
+  return {
+    list: list, get: get, getByHouse: getByHouse, create: create, update: update, remove: remove, seed: seed,
+    renew: renew, settle: settle
+  };
 });

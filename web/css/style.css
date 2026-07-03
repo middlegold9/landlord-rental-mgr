@@ -255,3 +255,23 @@ body {
 .tl-item:first-child { border-top: none; }
 .tl-item__time { flex: 0 0 96px; font-size: 12px; color: #9aa0a6; padding-top: 2px; }
 .tl-item__body { flex: 1 1 auto; }
+
+/* T21 搜索框 */
+.search-wrap { padding: 0 0 10px; }
+.search { width: 100%; padding: 10px 12px; border: 1px solid #e3e6ea; border-radius: 10px; font-size: 14px; background: #f7f8fa; }
+.search:focus { outline: none; border-color: #07c160; background: #fff; }
+
+/* 账单列表（T15/16/17） */
+.bill-list { list-style: none; margin-top: 8px; }
+.bill-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 0; border-top: 1px solid #f0f0f0; }
+.bill-row:first-child { border-top: none; }
+.bill-row__main { flex: 1 1 auto; min-width: 0; }
+.bill-row__side { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.bill-row__side .tag { margin-bottom: 2px; }
+
+/* 提醒红点（T20） */
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #cfd4da; margin-right: 6px; vertical-align: middle; }
+.dot--bad { background: #fa5151; }
+
+/* 小号按钮（标记已缴等） */
+.btn--sm { font-size: 12px; padding: 6px 10px; margin-top: 0; }
