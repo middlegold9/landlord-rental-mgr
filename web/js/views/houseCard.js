@@ -1,27 +1,22 @@
 /**
  * houseCard.js — 房源卡片纯函数（T5）
  * 入参 house（对齐 data-model 的 house 集合），输出安全 HTML 字符串。
- * 所有动态字段均转义，防 XSS（T3 将统一封装，此处先就地防御）。
+ * 转义统一走 utils/dom.escapeHtml（T3 收敛）。
  */
 (function (root, factory) {
   var deps;
   if (typeof module === 'object' && module.exports) {
-    deps = { status: require('../utils/status') };
+    deps = { status: require('../utils/status'), dom: require('../utils/dom') };
     module.exports = { houseCardHtml: factory(deps) };
   } else {
-    deps = { status: root.LRM.status };
+    deps = { status: root.LRM.status, dom: root.LRM };
     root.LRM = Object.assign(root.LRM || {}, { houseCardHtml: factory(deps) });
   }
 })(typeof self !== 'undefined' ? self : this, function (deps) {
   'use strict';
 
   var status = deps.status;
-
-  function escapeHtml(s) {
-    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
+  var escapeHtml = deps.dom.escapeHtml;
 
   function houseCardHtml(house) {
     if (!house) return '';

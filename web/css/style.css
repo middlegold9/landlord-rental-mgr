@@ -1,4 +1,4 @@
-/* 全局 + 手机比例仿真外壳（~390×844），视觉对齐微信小程序 */
+/* 全局 + 手机比例列（仅保留手机般修长比例，无仿真边框/状态栏） */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -11,36 +11,17 @@ body {
   color: #1f2329;
 }
 
-/* 手机外框 */
-.phone {
-  width: 390px;
-  height: 844px;
-  background: #fff;
-  border-radius: 44px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-  overflow: hidden;
-  border: 10px solid #111;
-}
-.phone__screen {
+/* 手机比例列 */
+.app {
+  width: 100%;
+  max-width: 430px;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  background: #f5f6f8;
-}
-
-/* 状态栏 */
-.statusbar {
-  height: 32px;
-  flex: 0 0 32px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 22px;
-  font-size: 13px;
-  color: #1f2329;
   background: #fff;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
-.statusbar__icons { letter-spacing: 1px; }
 
 /* 顶部应用栏 */
 .appbar {
@@ -166,3 +147,47 @@ body {
   cursor: pointer;
 }
 .btn:active { opacity: 0.85; }
+
+/* 表单（T6） */
+.btn--new { margin-bottom: 12px; }
+.form { display: flex; flex-direction: column; gap: 12px; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field__label { font-size: 13px; color: #5a5f66; }
+.field input, .field select {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid #d9dce0;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
+}
+.field--invalid input, .field--invalid select { border-color: #fa5151; }
+.field__err { font-size: 12px; color: #fa5151; }
+.field-row { display: flex; gap: 10px; }
+.field-row .field { flex: 1 1 0; }
+.form__actions { display: flex; gap: 10px; margin-top: 4px; }
+.btn--ghost { background: #f0f2f5; color: #1f2329; }
+
+/* 图册上传预览（T6） */
+.gallery-preview { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.gallery-thumb {
+  width: 64px; height: 64px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ececec;
+}
+
+/* 附件（T7） */
+.att-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f0f2f5;
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin: 4px 6px 4px 0;
+  text-decoration: none;
+  color: inherit;
+}
+.att-chip__icon { font-size: 18px; }
+.att-chip__name { font-size: 13px; }
