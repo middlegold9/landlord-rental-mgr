@@ -1,0 +1,13 @@
+{
+  "name": "landlord-rental-mgr",
+  "version": "0.1.0",
+  "private": true,
+  "description": "多套房房东出租/收租/事务管理（Web 优先，手机比例仿真小程序）；spec-kit + superpowers 驱动",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
