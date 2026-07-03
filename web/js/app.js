@@ -9,8 +9,7 @@
   var TABS = {
     overview:   { title: '概览',  render: renderOverview },
     houses:     { title: '房源',  render: renderHouses },
-    reminders:  { title: '提醒',  render: renderReminders },
-    mine:       { title: '我的',  render: renderMine }
+    reminders:  { title: '提醒',  render: renderReminders }
   };
 
   function el(id) { return document.getElementById(id); }
@@ -20,6 +19,13 @@
     LRM.channelRepo.seed();
     LRM.showingRepo.seed();
     LRM.signingRepo.seed();
+  }
+  function seedTenancy() {
+    LRM.leaseRepo.seed();
+    LRM.tenantRepo.seed();
+    LRM.utilityRepo.seed();
+    LRM.handoverRepo.seed();
+    LRM.repairRepo.seed();
   }
 
   function backBar() {
@@ -41,9 +47,6 @@
   }
   function renderReminders() {
     return '<section class="card"><h2>提醒</h2><p class="muted">带看 / 交租 / 到期 聚合（Phase 5 实现）。</p></section>';
-  }
-  function renderMine() {
-    return '<section class="card"><h2>我的</h2><p class="muted">房东资料 / 数据导出（Phase 5 实现）。</p></section>';
   }
 
   // 详情页（只读 + 编辑入口 + 附件列表 + 出房工作台入口）
@@ -73,6 +76,19 @@
         +   '<p class="muted">' + stageText + '</p></section>';
     }
 
+    var tenancy = '';
+    if (h.status === 'rented') {
+      tenancy = '<section class="card"><h2>已租管理</h2>'
+        +   '<div class="grid-2">'
+        +     '<button type="button" class="btn btn--ghost" id="open-lease">租约 / 租客</button>'
+        +     '<button type="button" class="btn btn--ghost" id="open-utility">费用 / 交接单</button>'
+        +   '</div></section>';
+    }
+
+    var maintenance = '<section class="card"><h2>维护</h2>'
+      +   '<button type="button" class="btn btn--ghost" id="open-repair">维修记录</button>'
+      + '</section>';
+
     return ''
       + '<section class="card">'
       +   '<h2>' + esc(h.nickname) + '</h2>'
@@ -88,6 +104,8 @@
       +   '</div>'
       + '</section>'
       + workflow
+      + tenancy
+      + maintenance
       + '<section class="card"><h2>图册 / 附件</h2>' + attHtml + '</section>';
   }
 
@@ -221,6 +239,137 @@
     renderSigning(houseId);
   }
 
+  // ——— T12 租约 / 租客 ———
+  function renderLease(houseId, draftLease, draftTenant, errors) {
+    seedTenancy();
+    var house = LRM.houseRepo.get(houseId);
+    var lease = draftLease || LRM.leaseRepo.getByHouse(houseId) || null;
+    var tenant = draftTenant || (lease ? LRM.tenantRepo.getByLease(lease._id) : null);
+    el('page').innerHTML = backBar() + LRM.leasePageHtml(house, lease, tenant, { editing: true, errors: errors || {} });
+  }
+  function readLeaseValues(form) {
+    var f = form.elements;
+    var v = {};
+    ['startDate', 'endDate', 'rent', 'deposit', 'payCycle', 'payMethod', 'status', 'contractFileID', 'contractRefType',
+      'wechat', 'phone', 'idCard', 'householdReg', 'occupation', 'income', 'occupants', 'emergencyContact', 'sourceChannel']
+      .forEach(function (n) { v[n] = f[n] ? f[n].value : ''; });
+    v.renewed = f.renewed ? f.renewed.checked : false;
+    v.hasPet = f.hasPet ? f.hasPet.checked : false;
+    return v;
+  }
+  function saveLease(e) {
+    e.preventDefault();
+    var form = e.target;
+    var houseId = form.getAttribute('data-house');
+    var leaseIdEl = form.elements['leaseId'];
+    var tenantIdEl = form.elements['tenantId'];
+    var vals = readLeaseValues(form);
+
+    var leaseBase = leaseIdEl && leaseIdEl.value ? { _id: leaseIdEl.value, houseId: houseId } : { houseId: houseId };
+    var lease = LRM.buildLease(vals, leaseBase);
+    var leaseErrs = LRM.validateLease(lease);
+
+    var tenantBase = tenantIdEl && tenantIdEl.value ? { _id: tenantIdEl.value } : {};
+    var tenant = LRM.buildTenant(vals, tenantBase);
+    var tenantErrs = LRM.validateTenant(tenant);
+
+    var allErrs = Object.assign({}, leaseErrs, tenantErrs);
+    if (Object.keys(allErrs).length) { renderLease(houseId, lease, tenant, allErrs); return; }
+
+    var savedLease = leaseBase._id ? LRM.leaseRepo.update(leaseBase._id, lease) : LRM.leaseRepo.create(lease);
+    tenant.leaseId = savedLease._id;
+    if (tenantBase._id) LRM.tenantRepo.update(tenantBase._id, tenant);
+    else LRM.tenantRepo.create(tenant);
+    openDetail(houseId);
+  }
+
+  // ——— T13 费用账户 / 入驻交接单 ———
+  function renderUtility(houseId, opts) {
+    opts = opts || {};
+    seedTenancy();
+    var house = LRM.houseRepo.get(houseId);
+    var utils = LRM.utilityRepo.list(houseId);
+    var lease = LRM.leaseRepo.getByHouse(houseId);
+    var handover = opts.handoverDraft || (lease ? LRM.handoverRepo.getByLease(lease._id) : null);
+    el('page').innerHTML = backBar() + LRM.utilityPageHtml(house, utils, handover, {
+      editingUtility: opts.editingUtility != null ? opts.editingUtility : null,
+      editingHandover: !!opts.editingHandover,
+      leaseId: lease ? lease._id : null,
+      errors: opts.errors || {}
+    });
+  }
+  function readUtilityValues(form) {
+    var f = form.elements;
+    return {
+      type: f.type ? f.type.value : 'water',
+      accountNo: f.accountNo ? f.accountNo.value : '',
+      moveInReading: f.moveInReading ? f.moveInReading.value : '',
+      moveOutReading: f.moveOutReading ? f.moveOutReading.value : '',
+      transferStatus: f.transferStatus ? f.transferStatus.value : 'pending'
+    };
+  }
+  function saveUtility(e) {
+    e.preventDefault();
+    var form = e.target;
+    var houseId = form.getAttribute('data-house');
+    var id = form.elements['_id'] ? form.elements['_id'].value : '';
+    var base = id ? { _id: id, houseId: houseId } : { houseId: houseId };
+    var u = LRM.buildUtility(readUtilityValues(form), base);
+    var errs = LRM.validateUtility(u);
+    if (Object.keys(errs).length) { renderUtility(houseId, { editingUtility: u, errors: errs }); return; }
+    if (id) LRM.utilityRepo.update(id, u); else LRM.utilityRepo.create(u);
+    renderUtility(houseId);
+  }
+  function saveHandover(e) {
+    e.preventDefault();
+    var form = e.target;
+    var houseId = form.getAttribute('data-house');
+    var leaseId = form.elements['leaseId'] ? form.elements['leaseId'].value : '';
+    var items = [];
+    var checks = form.querySelectorAll('[name^="item_ok_"]');
+    for (var i = 0; i < checks.length; i++) {
+      items.push({ name: checks[i].getAttribute('data-name'), ok: checks[i].checked, note: '' });
+    }
+    var values = {
+      handedAt: form.elements['handedAt'] ? form.elements['handedAt'].value : '',
+      note: form.elements['note'] ? form.elements['note'].value : '',
+      done: form.elements['done'] ? form.elements['done'].checked : false
+    };
+    var handover = LRM.buildHandover(values, items, { leaseId: leaseId });
+    var errs = LRM.validateHandover(handover);
+    if (Object.keys(errs).length) { renderUtility(houseId, { editingHandover: true, errors: errs, handoverDraft: handover }); return; }
+    LRM.handoverRepo.save(leaseId, handover);
+    renderUtility(houseId);
+  }
+
+  // ——— T14 维修 / 维护记录 ———
+  function renderRepair(houseId, draftRepair, errors) {
+    seedTenancy();
+    var house = LRM.houseRepo.get(houseId);
+    var repairs = LRM.repairRepo.list(houseId);
+    el('page').innerHTML = backBar() + LRM.repairPageHtml(house, repairs, { editing: !!draftRepair, repair: draftRepair || null, errors: errors || {} });
+  }
+  function readRepairValues(form) {
+    var f = form.elements;
+    return {
+      issue: f.issue ? f.issue.value : '',
+      kind: f.kind ? f.kind.value : 'in_unit',
+      handler: f.handler ? f.handler.value : '',
+      cost: f.cost ? f.cost.value : '',
+      reportedAt: f.reportedAt ? f.reportedAt.value : ''
+    };
+  }
+  function saveRepair(e) {
+    e.preventDefault();
+    var form = e.target;
+    var houseId = form.getAttribute('data-house');
+    var r = LRM.buildRepair(readRepairValues(form), { houseId: houseId });
+    var errs = LRM.validateRepair(r);
+    if (Object.keys(errs).length) { renderRepair(houseId, r, errs); return; }
+    LRM.repairRepo.create(r);
+    renderRepair(houseId);
+  }
+
   // ——— T6 房源表单 ———
   function renderHouseForm(house, errors) {
     formState.house = house || null;
@@ -334,6 +483,31 @@
     if (t.closest('[data-advance-signing]')) { advanceSigning(currentHouseId); return; }
     if (t.closest('[data-reset-signing]')) { resetSigning(currentHouseId); return; }
 
+    // T12 租约 / 租客：进入 / 编辑
+    if (t.closest('#open-lease')) { renderLease(currentHouseId); return; }
+    if (t.closest('#edit-lease')) { renderLease(currentHouseId); return; }
+    if (t.closest('[data-lease-cancel]')) { openDetail(currentHouseId); return; }
+
+    // T13 费用账户 / 交接单：进入 / 增删改
+    if (t.closest('#open-utility')) { renderUtility(currentHouseId); return; }
+    if (t.closest('#add-utility')) { renderUtility(currentHouseId, { editingUtility: {} }); return; }
+    var editUa = t.closest('[data-edit-utility]');
+    if (editUa) {
+      var ua = LRM.utilityRepo.get(editUa.getAttribute('data-edit-utility'));
+      renderUtility(currentHouseId, { editingUtility: ua || {} });
+      return;
+    }
+    var delUa = t.closest('[data-del-utility]');
+    if (delUa) { LRM.utilityRepo.remove(delUa.getAttribute('data-del-utility')); renderUtility(currentHouseId); return; }
+    if (t.closest('[data-utility-cancel]')) { renderUtility(currentHouseId); return; }
+    if (t.closest('#edit-handover')) { renderUtility(currentHouseId, { editingHandover: true }); return; }
+    if (t.closest('[data-handover-cancel]')) { renderUtility(currentHouseId); return; }
+
+    // T14 维修记录：进入 / 登记 / 取消
+    if (t.closest('#open-repair')) { renderRepair(currentHouseId, null, null); return; }
+    if (t.closest('#add-repair')) { renderRepair(currentHouseId, {}, null); return; }
+    if (t.closest('[data-repair-cancel]')) { renderRepair(currentHouseId, null, null); return; }
+
     // 房源相关（详情 / 列表 / 表单）
     if (t.closest('#back-to-list')) { show('houses'); return; }
     if (t.closest('#new-house')) { renderHouseForm({}, {}); return; }
@@ -381,6 +555,10 @@
       if (form.id === 'house-form') saveHouse(e);
       else if (form.id === 'channel-form') saveChannel(e);
       else if (form.id === 'showing-form') saveShowing(e);
+      else if (form.id === 'lease-form') saveLease(e);
+      else if (form.id === 'utility-form') saveUtility(e);
+      else if (form.id === 'handover-form') saveHandover(e);
+      else if (form.id === 'repair-form') saveRepair(e);
     });
     show('overview');
   }

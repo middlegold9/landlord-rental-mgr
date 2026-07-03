@@ -24,10 +24,13 @@
 - [x] checkpoint：待租链路可走通
 
 ## Phase 3 — 已租 / 租约
-- [ ] T12 `lease` / `tenant` 集合 + 租约信息 / 租客档案
-- [ ] T13 费用账户（`utility_account`）+ 入驻交接单
-- [ ] T14 维修 / 物业维护记录（`repair`）时间线
-- [ ] checkpoint：已租链路可录入
+- [x] T12 `lease` / `tenant` 集合 + 租约信息 / 租客档案（leasePage：租约+租客合并表单，元→分）
+- [x] T13 费用账户（`utility_account`）+ 入驻交接单（`handover`，T13 任务要求的支撑结构，data-model 未单列）
+- [x] T14 维修 / 物业维护记录（`repair`）时间线（倒序，状态/类别徽标）
+- [x] checkpoint：已租链路可录入（详情页「已租管理」→ 租约/租客 + 费用/交接单；全房源「维修记录」）
+
+## 全局调整
+- [x] 删除「我的」Tab（index.html tabbar + app.js TABS/renderMine）
 
 ## Phase 4 — 收租与账单（核心）
 - [ ] T15 `bill` 集合 + 账单生成纯函数（金额按分计算，含单测）

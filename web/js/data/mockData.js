@@ -168,5 +168,101 @@
     }
   ];
 
-  return { houses: houses, attachments: attachments, channels: channels, showings: showings, signings: signings };
+  // T12 租约 / 租客（house_demo_002 已租）
+  var leases = [
+    {
+      _id: 'lease_demo_001',
+      houseId: 'house_demo_002',
+      tenantId: 'tenant_demo_001',
+      startDate: '2026-05-01',
+      endDate: '2027-04-30',
+      rent: 680000,
+      deposit: 680000,
+      payCycle: 'month',
+      payMethod: '微信零钱 / 招商银行尾号6688',
+      status: 'active',
+      renewed: false,
+      contractRef: { fileID: 'att_demo_003', refType: '租赁合同' },
+      createdAt: '2026-05-01T08:00:00.000Z',
+      updatedAt: '2026-05-01T08:00:00.000Z'
+    }
+  ];
+
+  var tenants = [
+    {
+      _id: 'tenant_demo_001',
+      leaseId: 'lease_demo_001',
+      wechat: 'wxid_tenant_a',
+      phone: '13900000002',
+      idCard: '4403**********1234',
+      householdReg: '深户',
+      occupation: '互联网 · 产品',
+      income: 250000,
+      hasPet: false,
+      occupants: 2,
+      emergencyContact: '配偶 13800000003',
+      sourceChannel: '中介'
+    }
+  ];
+
+  // T13 费用账户（house_demo_002 / lease_demo_001）+ 入驻交接单
+  var utilityAccounts = [
+    { _id: 'ua_demo_001', houseId: 'house_demo_002', leaseId: 'lease_demo_001', type: 'water', accountNo: '水表 0218-334', moveInReading: 1820, moveOutReading: null, transferStatus: 'done' },
+    { _id: 'ua_demo_002', houseId: 'house_demo_002', leaseId: 'lease_demo_001', type: 'electricity', accountNo: '电表 0218-335', moveInReading: 9640, moveOutReading: null, transferStatus: 'done' },
+    { _id: 'ua_demo_003', houseId: 'house_demo_002', leaseId: 'lease_demo_001', type: 'gas', accountNo: '燃气 0218-336', moveInReading: 305, moveOutReading: null, transferStatus: 'pending' },
+    { _id: 'ua_demo_004', houseId: 'house_demo_002', leaseId: 'lease_demo_001', type: 'property', accountNo: '物业 海岸城物业', moveInReading: null, moveOutReading: null, transferStatus: 'pending' },
+    { _id: 'ua_demo_005', houseId: 'house_demo_002', leaseId: 'lease_demo_001', type: 'broadband', accountNo: '宽带 电信 100M', moveInReading: null, moveOutReading: null, transferStatus: 'done' }
+  ];
+
+  var handovers = [
+    {
+      _id: 'ho_demo_001',
+      houseId: 'house_demo_002',
+      leaseId: 'lease_demo_001',
+      handedAt: '2026-05-01',
+      note: '钥匙 2 把、门禁卡 1 张、已拍照留底',
+      items: [
+        { name: '入户门钥匙', ok: true, note: '' },
+        { name: '门禁卡', ok: true, note: '' },
+        { name: '水表读数确认', ok: true, note: '1820' },
+        { name: '电表读数确认', ok: true, note: '9640' },
+        { name: '家具家电清点', ok: false, note: '空调遥控器缺失 1 个' }
+      ],
+      done: false,
+      createdAt: '2026-05-01T08:00:00.000Z',
+      updatedAt: '2026-05-01T08:00:00.000Z'
+    }
+  ];
+
+  // T14 维修 / 维护记录
+  var repairs = [
+    {
+      _id: 'rp_demo_001',
+      houseId: 'house_demo_001',
+      kind: 'in_unit',
+      reportedAt: '2026-06-12T09:30:00.000Z',
+      issue: '主卧空调不制冷',
+      handler: '售后 · 格力 李师傅',
+      cost: 38000,
+      status: 'done',
+      proofRef: { fileID: '', refType: '维修凭证' }
+    },
+    {
+      _id: 'rp_demo_002',
+      houseId: 'house_demo_002',
+      kind: 'property',
+      reportedAt: '2026-06-20T14:00:00.000Z',
+      issue: '楼道感应灯常亮',
+      handler: '物业 · 工程部',
+      cost: 0,
+      status: 'doing',
+      proofRef: { fileID: '', refType: '维修凭证' }
+    }
+  ];
+
+  return {
+    houses: houses, attachments: attachments, channels: channels, showings: showings,
+    signings: signings, leases: leases, tenants: tenants, utilityAccounts: utilityAccounts,
+    handovers: handovers, repairs: repairs
+  };
 });

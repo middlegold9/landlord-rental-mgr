@@ -46,6 +46,11 @@
 - `houseId`/`leaseId`, `type`（水/电/燃气/物业/宽带）
 - `accountNo`, `moveInReading`, `moveOutReading`, `transferStatus`
 
+### handover（入驻交接单，T13 任务支撑结构）
+- `houseId`, `leaseId`, `handedAt`
+- `items: [{name, ok(bool), note}]`, `note`, `done`(bool)
+- 一条租约对应一份交接单（1—1），按 `leaseId` 存取
+
 ### repair（维修/维护）
 - `houseId`, `kind`: `in_unit`|`property`, `reportedAt`
 - `issue`, `handler`, `cost`(分), `status`, `proofRef`

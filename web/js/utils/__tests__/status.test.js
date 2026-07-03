@@ -22,6 +22,7 @@ test('isStatus 校验取值是否合法', () => {
 
 test('ENUMS 包含全部状态枚举', () => {
   expect(Object.keys(ENUMS).sort()).toEqual(
-    ['BILL_STATUS', 'CHANNEL_TYPE', 'HOUSE_STATUS', 'LEASE_STATUS', 'SHOWING_STATUS', 'SIGNING_STAGE'].sort()
+    ['BILL_STATUS', 'CHANNEL_TYPE', 'HOUSE_STATUS', 'LEASE_STATUS', 'PAY_CYCLE', 'REPAIR_KIND',
+     'REPAIR_STATUS', 'SHOWING_STATUS', 'SIGNING_STAGE', 'UTILITY_TRANSFER', 'UTILITY_TYPE'].sort()
   );
 });

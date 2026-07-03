@@ -234,3 +234,24 @@ body {
 .tl-step--done .tl-dot { background: #b7e6c8; color: #fff; }
 .tl-step--done .tl-label { color: #5a5f66; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* T12/T13/T14 子页样式 */
+.sub-h { font-size: 14px; font-weight: 600; margin: 14px 0 8px; color: #1f2329; }
+.tag--ok { background: #e6f7ed; color: #07c160; }
+.tag--done { background: #e6f7ed; color: #07c160; }
+.tag--doing { background: #fff4e0; color: #ff9f0a; }
+.tag--pending { background: #eef0f3; color: #6b7280; }
+.tag--cancelled, .tag--no_show { background: #fdecec; color: #fa5151; }
+
+/* 入驻交接单清单（T13） */
+.ho-list { list-style: none; margin-top: 8px; }
+.ho-list li { padding: 4px 0; font-size: 13px; color: #5a5f66; }
+.ho-list li.ok { color: #07c160; }
+.ho-list li.no { color: #fa5151; }
+
+/* 维修记录时间线（T14） */
+.tl-list { list-style: none; margin-top: 8px; }
+.tl-item { display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid #f0f0f0; }
+.tl-item:first-child { border-top: none; }
+.tl-item__time { flex: 0 0 96px; font-size: 12px; color: #9aa0a6; padding-top: 2px; }
+.tl-item__body { flex: 1 1 auto; }
