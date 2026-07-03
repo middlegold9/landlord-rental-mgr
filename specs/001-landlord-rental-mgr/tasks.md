@@ -4,14 +4,14 @@
 > 规则：TDD 优先（先写失败测试）；`[P]` 表示可并行；每个 Phase 末设 checkpoint。
 
 ## Phase 0 — 脚手架与安全基线
-- [ ] T1 确认 `.specify` / `CLAUDE.md` 就绪；建立 `web/` 工程骨架（index.html + 手机比例外壳 + TabBar）
-- [ ] T2 建立 `web/js/utils/` 纯函数骨架 + jest harness（金额÷100、日期、状态枚举）
+- [x] T1 确认 `.specify` / `CLAUDE.md` 就绪；建立 `web/` 工程骨架（index.html + 手机比例外壳 + TabBar）
+- [x] T2 建立 `web/js/utils/` 纯函数骨架 + jest harness（金额÷100、日期、状态枚举）
 - [ ] T3 前端输入校验 / 防 XSS 转义封装（含单测）
-- [ ] checkpoint：浏览器打开可见手机外壳 + Tab 切换，工具单测全绿
+- [x] checkpoint：浏览器打开可见手机外壳 + Tab 切换，工具单测全绿
 
 ## Phase 1 — 房源内核（MVP，Web）
-- [ ] T4 本地 Mock 数据层：`house` / `attachment` 读写封装（含单测）
-- [ ] T5 房源列表页（待租/已租 Segment）+ 房源卡片组件
+- [x] T4 本地 Mock 数据层：`house` / `attachment` 读写封装（含单测）
+- [x] T5 房源列表页（待租/已租 Segment）+ 房源卡片组件
 - [ ] T6 房源详情框架 + 基础信息表单（含图册，用 `<input type="file">` + 预览）
 - [ ] T7 文件附件（图片/PDF/Word 前端预览，挂载到房源） `[P]`
 - [ ] checkpoint：可新建房源并挂附件
